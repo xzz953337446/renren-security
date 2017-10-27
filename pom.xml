@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.7.RELEASE</version>
+		<version>1.5.8.RELEASE</version>
 	</parent>
 
 	<properties>
@@ -36,7 +36,7 @@
 
 		<!--wagon plugin 配置-->
 		<service-path>/work/renren</service-path>
-		<pack-name>${artifactId}.jar</pack-name>
+		<pack-name>${project.artifactId}.jar</pack-name>
 		<remote-addr>192.168.1.10:22</remote-addr>
 		<remote-username>root</remote-username>
 		<remote-passwd>123456</remote-passwd>
@@ -179,9 +179,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<fork>true</fork>
-				</configuration>
 			</plugin>
 			<!-- 跳过单元测试 -->
 			<plugin>
@@ -199,15 +196,13 @@
 					<fromFile>target/${pack-name}</fromFile>
 					<url><![CDATA[scp://${remote-username}:${remote-passwd}@${remote-addr}${service-path}]]></url>
 					<commands>
-						<!-- Kill Old Process -->
 						<command>pkill -f ${pack-name}</command>
 						<command>rm -f ${service-path}/renren.log</command>
-						<!-- Restart jar package，write result into renren.log -->
 						<command><![CDATA[nohup java -jar ${service-path}/${pack-name} > ${service-path}/renren.log 2>&1 & ]]></command>
 						<command><![CDATA[netstat -nptl]]></command>
 						<command><![CDATA[ps -ef | grep java | grep -v grep]]></command>
 					</commands>
-					<!-- 运行命令 mvn clean package wagon:upload-single wagon:sshexec-->
+					<!-- 运行命令 mvn clean package wagon:upload-single wagon:sshexec -->
 					<displayCommandOutputs>true</displayCommandOutputs>
 				</configuration>
 			</plugin>
@@ -237,7 +232,21 @@
 				<!-- 运行命令 mvn clean package docker:build 打包并生成docker镜像 -->
 			</plugin>
 		</plugins>
-		<finalName>${artifactId}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/webapp</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+		<finalName>${project.artifactId}</finalName>
 	</build>
 
 	<repositories>
